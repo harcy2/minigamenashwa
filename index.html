@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Petualangan Si Garuda: Kenalan dengan UUD 1945</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFF4E0;--card:#FFFFFF;--ink:#2B2340;--red:#D62839;--gold:#F2A900;--green:#2E9E5B;--soft:#FFE3E6;--line:#2B2340;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1F1A33;--card:#2D2650;--ink:#FFF4E0;--red:#FF6B78;--gold:#FFC93C;--green:#5FD38D;--soft:#4A2A44;--line:#FFF4E0}}
+*,*:before,*:after{box-sizing:inherit}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;min-height:100vh;display:flex;justify-content:center;padding:16px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+main{width:100%;max-width:560px}
+.card{background:var(--card);border:4px solid var(--line);border-radius:28px;padding:20px;box-shadow:0 8px 0 var(--line)}
+h1{font-size:2rem;line-height:1.15;margin:8px 0;color:var(--red)}
+h2{font-size:1.5rem;line-height:1.3;margin:12px 0}
+p{font-size:1.2rem;line-height:1.5;margin:8px 0}
+.hero{font-size:5rem;text-align:center;margin:0}
+.btn{font:inherit;font-weight:700;font-size:1.3rem;color:#fff;background:var(--red);border:4px solid var(--line);border-radius:20px;padding:14px 18px;width:100%;cursor:pointer;box-shadow:0 5px 0 var(--line);margin-top:12px}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--line)}
+.btn:focus-visible,.opt:focus-visible,.say:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
+.top{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:1.2rem;margin-bottom:10px}
+.bar{height:16px;border:3px solid var(--line);border-radius:10px;overflow:hidden;background:var(--soft)}
+.bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .4s}
+.q{display:flex;gap:10px;align-items:flex-start}
+.q h2{flex:1}
+.say{font-size:1.6rem;background:var(--gold);border:3px solid var(--line);border-radius:50%;width:52px;height:52px;cursor:pointer;flex:none}
+.opt{display:flex;align-items:center;gap:12px;font:inherit;font-weight:600;font-size:1.25rem;color:var(--ink);background:var(--card);border:4px solid var(--line);border-radius:20px;padding:12px 14px;width:100%;text-align:left;cursor:pointer;margin-top:10px;box-shadow:0 4px 0 var(--line)}
+.opt span.e{font-size:2rem}
+.opt.ok{background:var(--green);color:#fff}
+.opt.no{background:var(--soft);animation:shake .3s}
+.opt:disabled{cursor:default}
+.fb{font-size:1.2rem;font-weight:600;min-height:3.2em;margin-top:12px;line-height:1.4}
+.stars{font-size:2.6rem;text-align:center;letter-spacing:4px}
+.hide{display:none}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media (prefers-reduced-motion:reduce){.opt.no{animation:none}.bar i{transition:none}}
+</style>
+</head>
+<body>
+<main>
+  <section id="start" class="card">
+    <p class="hero">🦅</p>
+    <h1>Petualangan Si Garuda</h1>
+    <p>Halo, teman-teman! Ayo kenalan dengan <b>UUD 1945</b>. Jawab 15 pertanyaan dan kumpulkan bintang ⭐ sebanyak-banyaknya!</p>
+    <button class="btn" id="go">Mulai Main</button>
+  </section>
+
+  <section id="play" class="card hide">
+    <div class="top"><span id="no">Soal 1/15</span><span id="sc">⭐ 0</span></div>
+    <div class="bar"><i id="pg"></i></div>
+    <div class="q"><h2 id="qt"></h2><button class="say" id="say" aria-label="Bacakan soal">🔊</button></div>
+    <div id="opts"></div>
+    <div class="fb" id="fb" aria-live="polite"></div>
+    <button class="btn hide" id="next">Lanjut</button>
+  </section>
+
+  <section id="end" class="card hide">
+    <p class="hero" id="medal">🏆</p>
+    <h1 id="et"></h1>
+    <div class="stars" id="es"></div>
+    <p id="em" style="text-align:center"></p>
+    <button class="btn" id="again">Main Lagi</button>
+  </section>
+</main>
+<script>
+var Q=[
+{t:"UUD singkatan dari apa?",o:[["📜","Undang-Undang Dasar"],["💰","Uang Untuk Dibagi"],["🏫","Untuk Umum Dunia"]],a:0,f:"UUD artinya Undang-Undang Dasar, yaitu aturan paling dasar di negara kita."},
+{t:"UUD 1945 adalah aturan dasar untuk siapa?",o:[["🇮🇩","Negara Indonesia"],["🏠","Hanya satu rumah"],["🎮","Hanya untuk main game"]],a:0,f:"UUD 1945 adalah aturan dasar untuk seluruh negara Indonesia."},
+{t:"Dasar negara kita yang ada di Pembukaan UUD 1945 adalah...",o:[["⭐","Pancasila"],["⛺","Pramuka"],["🎵","Lagu daerah"]],a:0,f:"Pancasila adalah dasar negara kita. Ada lima sila, lho!"},
+{t:"UUD 1945 disahkan pada tahun...",o:[["1945","1945"],["2000","2000"],["1900","1900"]],a:0,f:"UUD 1945 disahkan pada 18 Agustus 1945, sehari setelah kemerdekaan."},
+{t:"Mendapat pendidikan, yaitu belajar di sekolah, adalah...",o:[["🎁","Hak"],["📋","Kewajiban"]],a:0,f:"Setiap anak berhak mendapat pendidikan. Itu hak kita!"},
+{t:"Menaati peraturan sekolah adalah...",o:[["🎁","Hak"],["📋","Kewajiban"]],a:1,f:"Menaati peraturan adalah kewajiban, yaitu tugas yang harus kita lakukan."},
+{t:"Beribadah sesuai agama yang kita yakini adalah...",o:[["🎁","Hak"],["📋","Kewajiban"]],a:0,f:"UUD 1945 menjamin hak setiap orang untuk beribadah sesuai agamanya."},
+{t:"Siapa yang memimpin negara Indonesia?",o:[["🧑‍💼","Presiden"],["🏫","Kepala sekolah"],["🏘️","Ketua RT"]],a:0,f:"Presiden memimpin negara Indonesia, sesuai aturan di UUD 1945."},
+{t:"Bunyi sila pertama Pancasila adalah...",o:[["🙏","Ketuhanan Yang Maha Esa"],["🤝","Persatuan Indonesia"],["⚖️","Keadilan sosial"]],a:0,f:"Sila pertama berbunyi Ketuhanan Yang Maha Esa. Lambangnya bintang ⭐."},
+{t:"Lambang negara Indonesia adalah...",o:[["🦅","Garuda Pancasila"],["🐯","Harimau"],["🐘","Gajah"]],a:0,f:"Lambang negara kita adalah Garuda Pancasila, sesuai UUD 1945."},
+{t:"Bendera negara Indonesia berwarna...",o:[["🇮🇩","Merah Putih"],["🔵","Biru Kuning"],["🟢","Hijau Putih"]],a:0,f:"Bendera kita Sang Merah Putih. Merah artinya berani, putih artinya suci."},
+{t:"Bahasa negara Indonesia adalah...",o:[["🗣️","Bahasa Indonesia"],["🌍","Bahasa Inggris"],["🎌","Bahasa Jepang"]],a:0,f:"Bahasa negara kita Bahasa Indonesia. Bahasa ini mempersatukan kita semua."},
+{t:"Menjaga kebersihan lingkungan sekolah adalah...",o:[["🎁","Hak"],["📋","Kewajiban"]],a:1,f:"Menjaga kebersihan adalah kewajiban kita bersama."},
+{t:"Diperlakukan adil tanpa dibeda-bedakan adalah...",o:[["🎁","Hak"],["📋","Kewajiban"]],a:0,f:"Setiap orang berhak diperlakukan adil dan sama, tanpa dibeda-bedakan."},
+{t:"Semboyan negara kita adalah Bhinneka Tunggal Ika. Artinya...",o:[["🌈","Berbeda-beda tetapi tetap satu"],["👯","Semua harus sama"],["🚫","Tidak boleh berteman"]],a:0,f:"Kita berbeda-beda suku dan agama, tetapi tetap satu Indonesia!"}
+];
+var $=function(i){return document.getElementById(i)};
+var i=0,score=0,done=false;
+function show(id){["start","play","end"].forEach(function(s){$(s).classList.toggle("hide",s!==id)})}
+function shuffle(a){a=a.slice();for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1));var t=a[k];a[k]=a[j];a[j]=t}return a}
+function render(){
+  var q=Q[i];done=false;
+  $("no").textContent="Soal "+(i+1)+"/"+Q.length;
+  $("sc").textContent="⭐ "+score;
+  $("pg").style.width=(i/Q.length*100)+"%";
+  $("qt").textContent=q.t;
+  $("fb").textContent="";
+  $("next").classList.add("hide");
+  var box=$("opts");box.innerHTML="";
+  var items=q.o.map(function(x,n){return{e:x[0],l:x[1],c:n===q.a}});
+  if(q.o.length>2)items=shuffle(items);
+  items.forEach(function(it){
+    var b=document.createElement("button");
+    b.className="opt";b.type="button";
+    b.innerHTML='<span class="e">'+it.e+'</span><span></span>';
+    b.lastChild.textContent=it.l;
+    b.onclick=function(){pick(b,it.c)};
+    b._c=it.c;box.appendChild(b);
+  });
+}
+function pick(b,ok){
+  if(done&&!ok)return;
+  if(ok){
+    done=true;score++;
+    b.classList.add("ok");
+    $("sc").textContent="⭐ "+score;
+    $("fb").textContent="Hebat! "+Q[i].f;
+    Array.prototype.forEach.call($("opts").children,function(x){x.disabled=true});
+    $("next").textContent=i===Q.length-1?"Lihat Hasil":"Lanjut";
+    $("next").classList.remove("hide");
+  }else{
+    b.classList.add("no");b.disabled=true;
+    $("fb").textContent="Ayo coba lagi, kamu pasti bisa! 💪";
+  }
+}
+function finish(){
+  show("end");
+  var s=score,n=Q.length;
+  $("es").textContent="⭐".repeat(s)+"☆".repeat(n-s);
+  $("medal").textContent=s>=12?"🏆":s>=7?"🥈":"🌱";
+  $("et").textContent=s>=12?"Luar biasa!":s>=7?"Bagus sekali!":"Ayo belajar lagi!";
+  $("em").textContent="Kamu mendapat "+s+" dari "+n+" bintang.";
+}
+$("go").onclick=function(){i=0;score=0;show("play");render()};
+$("next").onclick=function(){i++;if(i>=Q.length)finish();else render()};
+$("again").onclick=function(){i=0;score=0;show("play");render()};
+$("say").onclick=function(){
+  try{var u=new SpeechSynthesisUtterance(Q[i].t);u.lang="id-ID";u.rate=.85;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}
+};
+</script>
+</body>
+</html>
